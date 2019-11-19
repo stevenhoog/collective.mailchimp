@@ -24,6 +24,18 @@ from zope.component import getUtility
 from zope.interface import implementer
 from zope.interface import Invalid
 
+#Import portlet manager
+from plone.app.portlets.portlets import base
+
+import logging
+logger = logging.getLogger('collective.mailchimp')
+
+
+# Define child class to inherit from base.Renderer and keep all its methods and properties
+class portletBase(base.Renderer):
+    def __init__(self, *args):
+        base.Renderer.__init__(self, *args)
+        self.test = "Test"
 
 @implementer(INewsletterSubscribe, IAttributeAnnotatable)
 class NewsletterSubcriber(object):
@@ -59,11 +71,23 @@ class NewsletterSubscriberForm(extensible.ExtensibleForm, form.Form):
 
         # Retrieve the list id either from the request/form or fall back to
         # the default_list setting.
+
+        # Name and Id from portlet settings
+        print("Get Name and Id from portlet settings")
         list_id = self.context.REQUEST.get('list_id')
+
+        print("portletBase.data.name {}".format(portletBase().test))
+        print("mailchimp_settings.default_list: {}".format(self.mailchimp_settings.default_list))
+
         list_id = list_id or self.request.form.get('form.widgets.list_id')
         list_id = list_id or self.mailchimp_settings.default_list
         widgets['list_id'].mode = HIDDEN_MODE
         widgets['list_id'].value = list_id
+        keys = self.request.form.keys()
+        for key in keys:
+            print("Key: {}".format(key))
+        
+
 
         # Show/hide interest_groups widget
         self.available_interest_groups = self.mailchimp.groups(list_id=list_id)
@@ -201,6 +225,7 @@ class UnsubscribeNewsletterForm(extensible.ExtensibleForm, form.Form):
         if self.request.get('email'):
             self.widgets['email'].value = self.request['email']
 
+        # Set hidden list id field
         # Retrieve the list id either from the request/form or fall back to
         # the default_list setting.
         list_id = self.context.REQUEST.get('list_id')
