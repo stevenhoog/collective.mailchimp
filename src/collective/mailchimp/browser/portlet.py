@@ -53,6 +53,7 @@ class Assignment(base.Assignment):
         return _(u"MailChimp")
 
 
+# Render subscription form
 class Renderer(base.Renderer):
     fields = field.Fields(INewsletterSubscribe)
     _template = ViewPageTemplateFile('portlet.pt')
@@ -64,9 +65,11 @@ class Renderer(base.Renderer):
     def render(self):
         return xhtml_compress(self._template())
 
+    # Name from portlet settings
     @property
     def name(self):
-        return self.data.name or _(u"Subscribe to newsletter")
+        return "Mailchimp portlet title"
+        #return self.data.name or _(u"Subscribe to newsletter")
 
     @memoize
     def _data(self):
